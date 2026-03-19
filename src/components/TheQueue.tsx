@@ -1,48 +1,51 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useRef } from "react";
+import gsap from "gsap";
+import { useGSAP } from "@gsap/react";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 
-const CAPACITY = 100;
-const INITIAL = 38;
+if (typeof window !== "undefined") {
+  gsap.registerPlugin(ScrollTrigger);
+}
 
 export default function TheQueue() {
-  const [count, setCount] = useState(INITIAL);
+  const container = useRef<HTMLElement>(null);
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCount((prev) => Math.min(prev + 1, CAPACITY));
-    }, 8000);
-    return () => clearInterval(interval);
-  }, []);
-
-  const pct = Math.round((count / CAPACITY) * 100);
+  useGSAP(() => {
+    gsap.from(".queue-content", {
+      opacity: 0,
+      y: 30,
+      duration: 0.8,
+      ease: "power3.out",
+      scrollTrigger: {
+        trigger: container.current,
+        start: "top 78%",
+        toggleActions: "play none none reverse",
+      },
+    });
+  }, { scope: container });
 
   return (
-    <section className="py-24 px-4 md:px-8 lg:px-12 border-b border-black flex flex-col items-center justify-center bg-[#FAFAFA]">
-      <div className="text-center w-full max-w-2xl">
-        <div className="font-mono text-xs md:text-sm tracking-widest uppercase mb-6 flex items-center justify-center gap-2">
-          <span className="w-2 h-2 bg-black rounded-none animate-pulse"></span>
-          Slot Beta in Diretta
+    <section ref={container} className="py-24 px-4 md:px-8 lg:px-12 border-b border-black bg-[#FAFAFA]">
+      <div className="queue-content grid grid-cols-1 md:grid-cols-2 gap-16 md:gap-4 items-end">
+        <div>
+          <h3 className="text-3xl md:text-5xl font-bold uppercase tracking-tighter mb-6">
+            Lista d&apos;Attesa
+          </h3>
+          <p className="font-mono text-sm leading-relaxed opacity-60 max-w-md">
+            Slaidd è in sviluppo. Stiamo costruendo qualcosa che non esiste ancora.
+            Iscriviti per essere tra i primi ad accedere quando saremo pronti.
+          </p>
         </div>
-
-        <div className="text-5xl md:text-8xl font-bold font-mono tracking-tighter tabular-nums">
-          {count}
-        </div>
-
-        <div className="mt-4 font-mono uppercase tracking-widest text-sm opacity-50">
-          / {CAPACITY} slot beta occupati
-        </div>
-
-        <div className="mt-10 w-full border border-black h-3 relative overflow-hidden">
-          <div
-            className="h-full bg-black transition-all duration-[8000ms] ease-linear"
-            style={{ width: `${pct}%` }}
-          />
-        </div>
-        <div className="mt-2 flex justify-between font-mono text-xs uppercase tracking-widest opacity-40">
-          <span>0</span>
-          <span>{pct}% occupato</span>
-          <span>{CAPACITY}</span>
+        <div className="flex flex-col gap-4 md:items-end">
+          <div className="font-mono text-[5rem] md:text-[7rem] font-bold leading-none tracking-tighter">
+            38
+          </div>
+          <div className="font-mono text-xs uppercase tracking-widest opacity-40 flex items-center gap-2">
+            <span className="w-1.5 h-1.5 bg-black animate-pulse inline-block" />
+            persone già in lista
+          </div>
         </div>
       </div>
     </section>

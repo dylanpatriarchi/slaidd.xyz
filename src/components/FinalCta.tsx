@@ -47,23 +47,32 @@ export default function FinalCta() {
             [ RICHIESTA RICEVUTA. AVVIO DEL KERNEL. ]
           </div>
         ) : (
-          <form onSubmit={handleSubmit} className="flex w-full max-w-2xl border border-black flex-col sm:flex-row">
-            <input 
-              name="email"
-              type="email" 
-              placeholder="INSERISCI LA TUA EMAIL PER L'ACCESSO ANTICIPATO" 
-              className="flex-1 px-4 py-6 bg-transparent outline-none placeholder:text-black/50 font-mono text-sm uppercase border-b sm:border-b-0 sm:border-r border-black"
-              required
-              disabled={loading}
-            />
-            <button 
-              type="submit" 
-              disabled={loading}
-              className="px-12 py-6 bg-black text-white font-mono text-sm uppercase hover:bg-zinc-700 transition-colors whitespace-nowrap disabled:opacity-50"
-            >
-              {loading ? "ELABORAZIONE..." : "Richiedi Accesso"}
-            </button>
-          </form>
+          <>
+            <form onSubmit={handleSubmit} className="flex w-full max-w-2xl border border-black flex-col sm:flex-row">
+              <input
+                name="email"
+                type="email"
+                placeholder="INSERISCI LA TUA EMAIL PER L'ACCESSO ANTICIPATO"
+                className="flex-1 px-4 py-6 bg-transparent outline-none placeholder:text-black/50 font-mono text-sm uppercase border-b sm:border-b-0 sm:border-r border-black"
+                required
+                disabled={loading}
+              />
+              <button
+                type="submit"
+                disabled={loading}
+                className="px-12 py-6 bg-black text-white font-mono text-sm uppercase hover:bg-zinc-700 transition-colors whitespace-nowrap disabled:opacity-50"
+              >
+                {loading ? "ELABORAZIONE..." : "Richiedi Accesso"}
+              </button>
+            </form>
+            <p className="mt-4 font-mono text-[10px] uppercase tracking-widest opacity-30 text-center max-w-2xl leading-relaxed">
+              Inviando la tua email accetti la nostra{" "}
+              <a href="/privacy" className="underline hover:opacity-70 transition-opacity">
+                Privacy Policy
+              </a>
+              . Dati trattati da Rayo Consulting ai sensi del Reg. UE 2016/679 (GDPR).
+            </p>
+          </>
         )}
       </div>
     </section>

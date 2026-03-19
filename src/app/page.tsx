@@ -11,18 +11,18 @@ import { RevealSection } from "@/components/RevealSection";
 
 export default function Home() {
   return (
-    <main className="w-full pt-[57px]">
+    <main className="w-full">
       <Hero />
       <RevealSection>
         <Manifesto />
       </RevealSection>
-      <RevealSection id="live-anatomy">
+      <RevealSection>
         <LiveAnatomy />
       </RevealSection>
-      <RevealSection>
+      <RevealSection id="how-it-works">
         <LatencyMatrix />
       </RevealSection>
-      <RevealSection id="use-case">
+      <RevealSection>
         <UseCaseChronicles />
       </RevealSection>
       <RevealSection id="engine">

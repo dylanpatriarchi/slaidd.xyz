@@ -4,92 +4,152 @@ import { useRef } from "react";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { DrawSVGPlugin } from "gsap/DrawSVGPlugin";
 
 if (typeof window !== "undefined") {
-  gsap.registerPlugin(ScrollTrigger, DrawSVGPlugin);
+  gsap.registerPlugin(ScrollTrigger);
+}
+
+const WAVE_DELAYS = [0, 0.15, 0.3, 0.1, 0.25, 0.05, 0.35, 0.2, 0.08, 0.28];
+
+const TRANSCRIPT_LINES = [
+  "il mercato delle presentazioni",
+  "vale 10 miliardi di dollari...",
+  "noi lo stiamo ridefinendo_",
+];
+
+const JSON_LINES = [
+  '{ "slide": 1,',
+  '  "type": "title",',
+  '  "h1": "Market Size",',
+  '  "body": [...] }',
+];
+
+function WaveStation() {
+  return (
+    <div className="flex-1 bg-black text-white border-r border-white/10 p-6 md:p-8 flex flex-col justify-between min-h-[280px] md:min-h-[340px]">
+      <div className="font-mono text-xs tracking-widest opacity-40">01 — VOCE</div>
+      <div className="flex flex-col gap-1">
+        <div className="flex items-end gap-[3px] h-14">
+          {WAVE_DELAYS.map((d, i) => (
+            <span
+              key={i}
+              className="wave-bar w-[6px] bg-white inline-block h-full"
+              style={{ animationDelay: `${d}s` }}
+            />
+          ))}
+        </div>
+        <div className="font-mono text-xs opacity-40 mt-2 tracking-widest">INPUT AUDIO · VAD ATTIVO</div>
+      </div>
+      <div className="font-mono text-[10px] uppercase tracking-widest border-t border-white/10 pt-3 opacity-60">
+        Microfono nativo · No cloud
+      </div>
+    </div>
+  );
+}
+
+function TranscriptStation() {
+  return (
+    <div className="flex-1 bg-white text-black border-r border-black p-6 md:p-8 flex flex-col justify-between min-h-[280px] md:min-h-[340px]">
+      <div className="font-mono text-xs tracking-widest opacity-40">02 — LLM 1</div>
+      <div className="flex flex-col gap-1">
+        {TRANSCRIPT_LINES.map((line, i) => (
+          <p key={i} className="font-mono text-xs md:text-sm leading-relaxed text-black/80">
+            {i === TRANSCRIPT_LINES.length - 1 ? (
+              <>
+                {line.slice(0, -1)}
+                <span className="blink-cursor">|</span>
+              </>
+            ) : line}
+          </p>
+        ))}
+      </div>
+      <div className="font-mono text-[10px] uppercase tracking-widest border-t border-black pt-3 opacity-40">
+        Trascrizione + analisi semantica
+      </div>
+    </div>
+  );
+}
+
+function JsonStation() {
+  return (
+    <div className="flex-1 bg-white text-black border-r border-black p-6 md:p-8 flex flex-col justify-between min-h-[280px] md:min-h-[340px]">
+      <div className="font-mono text-xs tracking-widest opacity-40">03 — LLM 2</div>
+      <pre className="font-mono text-xs md:text-sm leading-relaxed text-black/80 whitespace-pre">
+        {JSON_LINES.join("\n")}
+      </pre>
+      <div className="font-mono text-[10px] uppercase tracking-widest border-t border-black pt-3 opacity-40">
+        Generazione layout · Istantanea
+      </div>
+    </div>
+  );
+}
+
+function SlideStation() {
+  return (
+    <div className="flex-1 bg-black text-white p-6 md:p-8 flex flex-col justify-between min-h-[280px] md:min-h-[340px]">
+      <div className="font-mono text-xs tracking-widest opacity-40">04 — SLIDE</div>
+      {/* Minimal slide mockup */}
+      <div className="border border-white/20 p-4 flex flex-col gap-2">
+        <div className="h-3 bg-white w-2/3" />
+        <div className="h-1.5 bg-white/30 w-full mt-1" />
+        <div className="h-1.5 bg-white/30 w-5/6" />
+        <div className="h-1.5 bg-white/30 w-4/6" />
+        <div className="mt-3 grid grid-cols-2 gap-2">
+          <div className="h-8 border border-white/20" />
+          <div className="h-8 border border-white/20" />
+        </div>
+      </div>
+      <div className="font-mono text-[10px] uppercase tracking-widest border-t border-white/10 pt-3 opacity-60">
+        Render immediato · Nessun template
+      </div>
+    </div>
+  );
 }
 
 export default function LiveAnatomy() {
-  const svgRef = useRef<SVGSVGElement>(null);
+  const container = useRef<HTMLDivElement>(null);
 
   useGSAP(() => {
-    const tl = gsap.timeline({
+    gsap.from(".anatomy-station", {
+      opacity: 0,
+      y: 40,
+      duration: 0.7,
+      ease: "power3.out",
+      stagger: 0.12,
       scrollTrigger: {
-        trigger: svgRef.current,
+        trigger: container.current,
         start: "top 75%",
         toggleActions: "play none none reverse",
       },
     });
-
-    tl.from("#box-1", { opacity: 0, x: -40, duration: 0.45, ease: "power3.out" })
-      .from("#box-2", { opacity: 0, y: 30,  duration: 0.45, ease: "power3.out" }, "-=0.15")
-      .from("#box-3", { opacity: 0, y: 30,  duration: 0.45, ease: "power3.out" }, "-=0.15")
-      .from("#box-4", { opacity: 0, x: 40,  duration: 0.45, ease: "power3.out" }, "-=0.15")
-      .fromTo("#arr-1", { drawSVG: "0%" }, { drawSVG: "100%", duration: 0.3, ease: "none" }, "-=0.1")
-      .fromTo("#arr-2", { drawSVG: "0%" }, { drawSVG: "100%", duration: 0.3, ease: "none" }, "-=0.05")
-      .fromTo("#arr-3", { drawSVG: "0%" }, { drawSVG: "100%", duration: 0.3, ease: "none" }, "-=0.05")
-      .to("#pulse-dot", { scale: 1.8, opacity: 0.3, repeat: -1, yoyo: true, duration: 0.9, ease: "sine.inOut" }, "-=0.1");
-  }, { scope: svgRef });
+  }, { scope: container });
 
   return (
-    <section className="py-24 px-4 md:px-8 lg:px-12 border-b border-black">
-      <h3 className="text-3xl md:text-5xl font-bold uppercase mb-12 tracking-tighter">
-        Anatomia in Diretta
-      </h3>
-      <div className="w-full aspect-square sm:aspect-video md:aspect-[21/9] border border-black p-4 flex items-center justify-center relative bg-white">
-        <svg
-          ref={svgRef}
-          className="w-full h-full"
-          viewBox="0 0 1100 400"
-          preserveAspectRatio="xMidYMid meet"
-        >
-          <defs>
-            <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
-              <path d="M 40 0 L 0 0 0 40" fill="none" stroke="rgba(0,0,0,0.06)" strokeWidth="1" />
-            </pattern>
-            <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-              <path d="M 0 0 L 10 5 L 0 10 z" fill="black" />
-            </marker>
-          </defs>
-          <rect width="100%" height="100%" fill="url(#grid)" />
+    <section id="live-anatomy" className="py-24 px-4 md:px-8 lg:px-12 border-b border-black">
+      <div className="flex flex-col md:flex-row items-start justify-between mb-10 gap-4">
+        <h3 className="text-3xl md:text-5xl font-bold uppercase tracking-tighter">
+          Pipeline in Diretta
+        </h3>
+        <p className="font-mono text-xs uppercase tracking-widest opacity-50 md:text-right max-w-xs leading-relaxed">
+          Dalla voce alla slide.<br />Tempo medio: &lt; 1 secondo.
+        </p>
+      </div>
 
-          {/* 1 — Acquisizione Voce */}
-          <g id="box-1">
-            <rect x="30" y="155" width="190" height="90" fill="black" />
-            <text x="125" y="196" fill="white" fontSize="13" fontFamily="monospace" textAnchor="middle" fontWeight="bold">ACQUISIZIONE</text>
-            <text x="125" y="214" fill="white" fontSize="13" fontFamily="monospace" textAnchor="middle" fontWeight="bold">VOCE</text>
-          </g>
+      <div ref={container} className="flex flex-col md:flex-row border border-black overflow-hidden">
+        <div className="anatomy-station flex-1 contents md:flex md:flex-row w-full">
+          <WaveStation />
+          <TranscriptStation />
+          <JsonStation />
+          <SlideStation />
+        </div>
+      </div>
 
-          {/* 2 — LLM 1: Trascrizione */}
-          <g id="box-2">
-            <rect x="290" y="155" width="190" height="90" fill="white" stroke="black" strokeWidth="2" />
-            <text x="385" y="192" fill="black" fontSize="12" fontFamily="monospace" textAnchor="middle">LLM 1</text>
-            <text x="385" y="212" fill="black" fontSize="11" fontFamily="monospace" textAnchor="middle">TRASCRIZIONE +</text>
-            <text x="385" y="228" fill="black" fontSize="11" fontFamily="monospace" textAnchor="middle">CONTESTO</text>
-          </g>
-
-          {/* 3 — LLM 2: Layout */}
-          <g id="box-3">
-            <rect x="550" y="155" width="190" height="90" fill="white" stroke="black" strokeWidth="2" />
-            <text x="645" y="192" fill="black" fontSize="12" fontFamily="monospace" textAnchor="middle">LLM 2</text>
-            <text x="645" y="212" fill="black" fontSize="11" fontFamily="monospace" textAnchor="middle">GENERAZIONE</text>
-            <text x="645" y="228" fill="black" fontSize="11" fontFamily="monospace" textAnchor="middle">LAYOUT</text>
-            <circle id="pulse-dot" cx="645" cy="272" r="5" fill="black" />
-          </g>
-
-          {/* 4 — Output Slide */}
-          <g id="box-4">
-            <rect x="810" y="155" width="250" height="90" fill="black" />
-            <text x="935" y="196" fill="white" fontSize="13" fontFamily="monospace" textAnchor="middle" fontWeight="bold">OUTPUT</text>
-            <text x="935" y="214" fill="white" fontSize="13" fontFamily="monospace" textAnchor="middle" fontWeight="bold">SLIDE</text>
-          </g>
-
-          {/* Arrows */}
-          <path id="arr-1" d="M 220 200 L 285 200" stroke="black" strokeWidth="2" fill="none" markerEnd="url(#arrow)" />
-          <path id="arr-2" d="M 480 200 L 545 200" stroke="black" strokeWidth="2" fill="none" markerEnd="url(#arrow)" />
-          <path id="arr-3" d="M 740 200 L 805 200" stroke="black" strokeWidth="2" fill="none" markerEnd="url(#arrow)" />
-        </svg>
+      {/* Arrow labels between stations — desktop only */}
+      <div className="hidden md:flex mt-3 font-mono text-[10px] uppercase tracking-widest opacity-30">
+        <div className="flex-1 text-center">Voce in ingresso</div>
+        <div className="flex-1 text-center">→ Testo + Contesto</div>
+        <div className="flex-1 text-center">→ Struttura JSON</div>
+        <div className="flex-1 text-center">→ Slide Renderizzata</div>
       </div>
     </section>
   );
