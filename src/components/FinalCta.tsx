@@ -6,7 +6,7 @@ export default function FinalCta() {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: { preventDefault(): void; currentTarget: HTMLFormElement }) => {
     e.preventDefault();
     setLoading(true);
     
@@ -43,7 +43,7 @@ export default function FinalCta() {
         <h3 className="text-3xl md:text-5xl font-bold uppercase mb-12 text-center">Smetti di Fare Slide</h3>
         
         {success ? (
-          <div className="font-mono text-xl uppercase tracking-widest text-pureblue border border-black p-8 bg-black text-white">
+          <div className="font-mono text-xl uppercase tracking-widest border border-black p-8 bg-black text-white">
             [ RICHIESTA RICEVUTA. AVVIO DEL KERNEL. ]
           </div>
         ) : (
@@ -59,7 +59,7 @@ export default function FinalCta() {
             <button 
               type="submit" 
               disabled={loading}
-              className="px-12 py-6 bg-black text-white font-mono text-sm uppercase hover:bg-pureblue transition-colors whitespace-nowrap disabled:opacity-50"
+              className="px-12 py-6 bg-black text-white font-mono text-sm uppercase hover:bg-zinc-700 transition-colors whitespace-nowrap disabled:opacity-50"
             >
               {loading ? "ELABORAZIONE..." : "Richiedi Accesso"}
             </button>

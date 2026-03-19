@@ -7,19 +7,36 @@ import TheEngine from "@/components/TheEngine";
 import ComparisonTable from "@/components/ComparisonTable";
 import TheQueue from "@/components/TheQueue";
 import FinalCta from "@/components/FinalCta";
+import { RevealSection } from "@/components/RevealSection";
 
 export default function Home() {
   return (
-    <main className="w-full">
+    <main className="w-full pt-[57px]">
       <Hero />
-      <Manifesto />
-      <LiveAnatomy />
-      <LatencyMatrix />
-      <UseCaseChronicles />
-      <TheEngine />
-      <ComparisonTable />
-      <TheQueue />
-      <FinalCta />
+      <RevealSection>
+        <Manifesto />
+      </RevealSection>
+      <RevealSection id="live-anatomy">
+        <LiveAnatomy />
+      </RevealSection>
+      <RevealSection>
+        <LatencyMatrix />
+      </RevealSection>
+      <RevealSection id="use-case">
+        <UseCaseChronicles />
+      </RevealSection>
+      <RevealSection id="engine">
+        <TheEngine />
+      </RevealSection>
+      <RevealSection id="comparison">
+        <ComparisonTable />
+      </RevealSection>
+      <RevealSection>
+        <TheQueue />
+      </RevealSection>
+      <RevealSection id="final-cta">
+        <FinalCta />
+      </RevealSection>
     </main>
   );
 }
