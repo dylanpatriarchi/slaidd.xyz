@@ -1,22 +1,14 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist } from "next/font/google";
 import "./globals.css";
-import SmoothScrolling from "@/components/SmoothScrolling";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
-
 export const metadata: Metadata = {
-  title: "Slaidd — Parla. Le Slide Ti Seguono.",
+  title: "Slaidd: Parla. Le Slide Ti Seguono.",
   description:
     "Slaidd è l'app desktop IA che genera le tue slide in tempo reale mentre parli. Nessun template. Solo la tua voce.",
   keywords: [
@@ -34,7 +26,7 @@ export const metadata: Metadata = {
     canonical: "/",
   },
   openGraph: {
-    title: "Slaidd — Parla. Le Slide Ti Seguono.",
+    title: "Slaidd: Parla. Le Slide Ti Seguono.",
     description:
       "L'app desktop IA che genera slide in tempo reale dalla tua voce. Unisciti alla lista d'attesa.",
     url: "https://slaidd.xyz",
@@ -44,7 +36,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Slaidd — Parla. Le Slide Ti Seguono.",
+    title: "Slaidd: Parla. Le Slide Ti Seguono.",
     description:
       "L'app desktop IA che genera slide in tempo reale dalla tua voce.",
   },
@@ -66,16 +58,25 @@ export default function RootLayout({
   return (
     <html
       lang="it"
-      className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+      className={`${geistSans.variable} antialiased`}
     >
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-white text-black selection:bg-black selection:text-white`}
+        className={`relative ${geistSans.variable} antialiased bg-white text-black selection:bg-black selection:text-white`}
       >
-        <Navbar />
-        <SmoothScrolling>
-          {children}
-          <Footer />
-        </SmoothScrolling>
+        {children}
+
+        {/* Legal footer - fixed bottom right */}
+        <footer className="fixed bottom-4 right-4 md:bottom-6 md:right-6 z-50 flex flex-col items-end gap-1 text-right">
+          <a
+            href="/privacy"
+            className="text-[10px] text-zinc-400 hover:text-zinc-700 transition-colors leading-none"
+          >
+            Privacy Policy
+          </a>
+          <span className="text-[10px] text-zinc-300 leading-none">
+            © {new Date().getFullYear()} Rayo Consulting di Patriarchi Dylan · P.IVA 03988190546
+          </span>
+        </footer>
       </body>
     </html>
   );

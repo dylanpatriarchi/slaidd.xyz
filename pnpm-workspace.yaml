@@ -1,3 +1,6 @@
+packages:
+  - "remotion"
+
 ignoredBuiltDependencies:
   - sharp
   - unrs-resolver
