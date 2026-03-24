@@ -5,54 +5,21 @@ import { motion, useTransform, useSpring, useMotionValue, MotionValue } from "fr
 
 export type AnimationPhase = "scatter" | "line" | "circle" | "bottom-strip";
 
-// --- Slide mockup SVGs as data URIs ---
-// Each represents a different presentation slide layout
-function makeSlideSVG(content: string, bg = "#ffffff") {
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 112"><rect width="160" height="112" fill="${bg}"/>${content}</svg>`;
-  return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
-}
+// --- Slide Image URLs ---
+const BASE_SLIDES = [
+  "/slides/slide-1.png",
+  "/slides/slide-2.png",
+  "/slides/slide-3.png",
+  "/slides/slide-4.png",
+  "/slides/slide-5.png",
+];
 
+// Repeat the 5 slides 4 times to fill the 20 slots
 const SLIDES = [
-  // 1. Title slide
-  makeSlideSVG(`<rect x="20" y="34" width="92" height="10" rx="1.5" fill="#111"/><rect x="20" y="50" width="64" height="5" rx="1" fill="#d4d4d4"/><rect x="20" y="59" width="48" height="5" rx="1" fill="#d4d4d4"/><rect x="20" y="88" width="20" height="2.5" rx="1" fill="#111"/>`),
-  // 2. Two column
-  makeSlideSVG(`<rect x="14" y="12" width="72" height="7" rx="1" fill="#111"/><rect x="14" y="26" width="62" height="4" rx="1" fill="#e5e5e5"/><rect x="14" y="33" width="56" height="4" rx="1" fill="#e5e5e5"/><rect x="14" y="40" width="50" height="4" rx="1" fill="#e5e5e5"/><rect x="14" y="47" width="44" height="4" rx="1" fill="#e5e5e5"/><rect x="84" y="22" width="62" height="56" rx="2" fill="#f0f0f0"/>`),
-  // 3. Big stat
-  makeSlideSVG(`<rect x="40" y="24" width="80" height="36" rx="2" fill="#111"/><rect x="50" y="70" width="60" height="5" rx="1" fill="#d4d4d4"/><rect x="60" y="79" width="40" height="4" rx="1" fill="#e5e5e5"/>`, "#fafafa"),
-  // 4. Bullet list
-  makeSlideSVG(`<rect x="14" y="12" width="60" height="7" rx="1" fill="#111"/><rect x="14" y="28" width="6" height="6" rx="1" fill="#111"/><rect x="24" y="30" width="80" height="4" rx="1" fill="#d4d4d4"/><rect x="14" y="40" width="6" height="6" rx="1" fill="#111"/><rect x="24" y="42" width="68" height="4" rx="1" fill="#d4d4d4"/><rect x="14" y="52" width="6" height="6" rx="1" fill="#111"/><rect x="24" y="54" width="74" height="4" rx="1" fill="#d4d4d4"/><rect x="14" y="64" width="6" height="6" rx="1" fill="#111"/><rect x="24" y="66" width="56" height="4" rx="1" fill="#d4d4d4"/>`),
-  // 5. Dark title
-  makeSlideSVG(`<rect x="20" y="34" width="88" height="11" rx="1.5" fill="#ffffff"/><rect x="20" y="51" width="60" height="5" rx="1" fill="rgba(255,255,255,0.3)"/><rect x="20" y="60" width="44" height="5" rx="1" fill="rgba(255,255,255,0.3)"/>`, "#111111"),
-  // 6. Bar chart
-  makeSlideSVG(`<rect x="14" y="12" width="56" height="6" rx="1" fill="#111"/><rect x="24" y="72" width="16" height="20" rx="1" fill="#111"/><rect x="44" y="58" width="16" height="34" rx="1" fill="#111"/><rect x="64" y="44" width="16" height="48" rx="1" fill="#111"/><rect x="84" y="50" width="16" height="42" rx="1" fill="#d4d4d4"/><rect x="104" y="38" width="16" height="54" rx="1" fill="#d4d4d4"/><rect x="14" y="92" width="120" height="1.5" fill="#e5e5e5"/>`),
-  // 7. Three columns
-  makeSlideSVG(`<rect x="14" y="12" width="60" height="7" rx="1" fill="#111"/><rect x="14" y="30" width="36" height="48" rx="2" fill="#f5f5f5"/><rect x="56" y="30" width="36" height="48" rx="2" fill="#f0f0f0"/><rect x="98" y="30" width="36" height="48" rx="2" fill="#f5f5f5"/><rect x="18" y="50" width="28" height="4" rx="1" fill="#d4d4d4"/><rect x="60" y="50" width="28" height="4" rx="1" fill="#d4d4d4"/><rect x="102" y="50" width="28" height="4" rx="1" fill="#d4d4d4"/>`),
-  // 8. Quote / highlight
-  makeSlideSVG(`<rect x="14" y="30" width="4" height="52" rx="2" fill="#111"/><rect x="26" y="32" width="80" height="6" rx="1" fill="#111"/><rect x="26" y="42" width="72" height="5" rx="1" fill="#d4d4d4"/><rect x="26" y="51" width="64" height="5" rx="1" fill="#d4d4d4"/><rect x="26" y="60" width="56" height="5" rx="1" fill="#d4d4d4"/><rect x="26" y="72" width="40" height="4" rx="1" fill="#e5e5e5"/>`),
-  // 9. Timeline
-  makeSlideSVG(`<rect x="14" y="12" width="68" height="7" rx="1" fill="#111"/><rect x="14" y="54" width="132" height="2" fill="#e5e5e5"/><rect x="22" y="49" width="12" height="12" rx="6" fill="#111"/><rect x="56" y="49" width="12" height="12" rx="6" fill="#111"/><rect x="90" y="49" width="12" height="12" rx="6" fill="#d4d4d4"/><rect x="124" y="49" width="12" height="12" rx="6" fill="#e5e5e5"/><rect x="16" y="66" width="24" height="4" rx="1" fill="#d4d4d4"/><rect x="50" y="66" width="24" height="4" rx="1" fill="#d4d4d4"/><rect x="84" y="66" width="24" height="4" rx="1" fill="#e5e5e5"/><rect x="118" y="66" width="24" height="4" rx="1" fill="#e5e5e5"/>`),
-  // 10. Side accent + text
-  makeSlideSVG(`<rect x="0" y="0" width="32" height="112" fill="#111"/><rect x="44" y="28" width="80" height="9" rx="1.5" fill="#111"/><rect x="44" y="44" width="72" height="5" rx="1" fill="#d4d4d4"/><rect x="44" y="53" width="64" height="5" rx="1" fill="#d4d4d4"/><rect x="44" y="62" width="56" height="5" rx="1" fill="#d4d4d4"/><rect x="44" y="78" width="28" height="2.5" rx="1" fill="#111"/>`),
-  // 11. Grid 2x2
-  makeSlideSVG(`<rect x="14" y="12" width="52" height="6" rx="1" fill="#111"/><rect x="14" y="28" width="60" height="30" rx="2" fill="#f5f5f5"/><rect x="82" y="28" width="60" height="30" rx="2" fill="#f0f0f0"/><rect x="14" y="66" width="60" height="30" rx="2" fill="#f0f0f0"/><rect x="82" y="66" width="60" height="30" rx="2" fill="#f5f5f5"/>`),
-  // 12. Dark two-column
-  makeSlideSVG(`<rect x="0" y="0" width="80" height="112" fill="#111"/><rect x="14" y="36" width="52" height="9" rx="1.5" fill="#ffffff"/><rect x="14" y="52" width="44" height="4" rx="1" fill="rgba(255,255,255,0.3)"/><rect x="14" y="60" width="36" height="4" rx="1" fill="rgba(255,255,255,0.3)"/><rect x="92" y="20" width="52" height="72" rx="2" fill="#f5f5f5"/>`),
-  // 13. Data dashboard
-  makeSlideSVG(`<rect x="14" y="12" width="44" height="5" rx="1" fill="#111"/><rect x="14" y="24" width="36" height="28" rx="2" fill="#f5f5f5"/><rect x="56" y="24" width="36" height="28" rx="2" fill="#f0f0f0"/><rect x="98" y="24" width="36" height="28" rx="2" fill="#f5f5f5"/><rect x="14" y="58" width="120" height="36" rx="2" fill="#f8f8f8"/><rect x="20" y="62" width="60" height="4" rx="1" fill="#d4d4d4"/><rect x="20" y="70" width="48" height="4" rx="1" fill="#e5e5e5"/>`),
-  // 14. Minimal text only
-  makeSlideSVG(`<rect x="20" y="42" width="120" height="8" rx="1.5" fill="#111"/><rect x="40" y="56" width="80" height="5" rx="1" fill="#d4d4d4"/><rect x="50" y="65" width="60" height="5" rx="1" fill="#e5e5e5"/>`, "#fafafa"),
-  // 15. Image placeholder hero
-  makeSlideSVG(`<rect x="0" y="0" width="160" height="70" fill="#f0f0f0"/><rect x="20" y="78" width="88" height="8" rx="1.5" fill="#111"/><rect x="20" y="92" width="56" height="4" rx="1" fill="#d4d4d4"/>`, "#ffffff"),
-  // 16. Side-by-side stats
-  makeSlideSVG(`<rect x="14" y="14" width="52" height="6" rx="1" fill="#111"/><rect x="14" y="30" width="62" height="52" rx="2" fill="#111"/><rect x="84" y="30" width="62" height="24" rx="2" fill="#f0f0f0"/><rect x="84" y="58" width="62" height="24" rx="2" fill="#f5f5f5"/>`),
-  // 17. Full dark with accent
-  makeSlideSVG(`<rect x="14" y="32" width="132" height="2" fill="rgba(255,255,255,0.15)"/><rect x="14" y="40" width="84" height="10" rx="1.5" fill="#ffffff"/><rect x="14" y="56" width="64" height="5" rx="1" fill="rgba(255,255,255,0.4)"/><rect x="14" y="65" width="48" height="5" rx="1" fill="rgba(255,255,255,0.25)"/><rect x="14" y="82" width="132" height="2" fill="rgba(255,255,255,0.15)"/>`, "#0a0a0a"),
-  // 18. Process steps horizontal
-  makeSlideSVG(`<rect x="14" y="14" width="56" height="6" rx="1" fill="#111"/><rect x="14" y="32" width="32" height="32" rx="2" fill="#111"/><rect x="56" y="32" width="32" height="32" rx="2" fill="#e5e5e5"/><rect x="98" y="32" width="32" height="32" rx="2" fill="#f0f0f0"/><rect x="130" y="32" width="32" height="32" rx="2" fill="#f5f5f5"/><rect x="46" y="45" width="10" height="4" rx="1" fill="#d4d4d4"/><rect x="88" y="45" width="10" height="4" rx="1" fill="#d4d4d4"/><rect x="130" y="45" width="10" height="4" rx="1" fill="#e5e5e5"/>`),
-  // 19. Large visual card
-  makeSlideSVG(`<rect x="14" y="14" width="60" height="60" rx="3" fill="#111"/><rect x="82" y="14" width="64" height="7" rx="1" fill="#111"/><rect x="82" y="26" width="56" height="4" rx="1" fill="#d4d4d4"/><rect x="82" y="34" width="48" height="4" rx="1" fill="#e5e5e5"/><rect x="82" y="42" width="52" height="4" rx="1" fill="#e5e5e5"/><rect x="82" y="50" width="40" height="4" rx="1" fill="#e5e5e5"/><rect x="14" y="84" width="132" height="1.5" fill="#ebebeb"/>`),
-  // 20. Conclusion / CTA
-  makeSlideSVG(`<rect x="0" y="0" width="160" height="112" fill="#111"/><rect x="30" y="30" width="100" height="10" rx="2" fill="#ffffff"/><rect x="40" y="46" width="80" height="5" rx="1" fill="rgba(255,255,255,0.3)"/><rect x="50" y="55" width="60" height="5" rx="1" fill="rgba(255,255,255,0.2)"/><rect x="52" y="72" width="56" height="14" rx="7" fill="#ffffff"/>`),
+  ...BASE_SLIDES,
+  ...BASE_SLIDES,
+  ...BASE_SLIDES,
+  ...BASE_SLIDES,
 ];
 
 interface CardProps {

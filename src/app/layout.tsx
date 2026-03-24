@@ -63,6 +63,11 @@ export default function RootLayout({
       <body
         className={`relative ${geistSans.variable} antialiased bg-white text-black selection:bg-black selection:text-white`}
       >
+        {/* Top left logo */}
+        <div className="fixed top-6 left-6 z-[100] mix-blend-difference pointer-events-none">
+          <img src="/slaidd.png" alt="Slaidd Logo" className="w-8 h-8 rounded-full" />
+        </div>
+
         {children}
 
         {/* Legal footer - fixed bottom right */}
