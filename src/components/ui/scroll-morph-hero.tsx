@@ -25,9 +25,10 @@ const SLIDES = [
 interface CardProps {
   src: string;
   target: { x: number; y: number; rotation: number; scale: number; opacity: number };
+  size: { width: number; height: number };
 }
 
-function SlideCard({ src, target }: CardProps) {
+function SlideCard({ src, target, size }: CardProps) {
   return (
     <motion.div
       animate={{
@@ -38,7 +39,7 @@ function SlideCard({ src, target }: CardProps) {
         opacity: target.opacity,
       }}
       transition={{ type: "spring", stiffness: 40, damping: 15 }}
-      style={{ position: "absolute", width: 64, height: 90 }}
+      style={{ position: "absolute", width: size.width, height: size.height }}
     >
       <div className="absolute inset-0 overflow-hidden rounded-xl shadow-md border border-black/8 bg-white">
         <img src={src} alt="" className="h-full w-full object-cover" draggable={false} />
@@ -152,21 +153,36 @@ export default function IntroAnimation({ progress }: { progress?: MotionValue<nu
 
   const contentOpacity = useTransform(smoothMorph, [0.8, 1], [0, 1]);
   const contentY = useTransform(smoothMorph, [0.8, 1], [20, 0]);
+  const isMobile = containerSize.width < 768;
+  const visibleSlideCount = isMobile ? 18 : TOTAL_SLIDES;
+  const cardSize = isMobile
+    ? { width: 74, height: 106 }
+    : { width: 64, height: 90 };
 
   return (
     <div ref={containerRef} className="relative w-full h-full bg-[#FAFAFA] overflow-hidden">
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_45%,#ffffff_0%,#f6f6f6_58%,#eeeeee_100%)]" />
       <div className="flex h-full w-full flex-col items-center justify-center perspective-[1000px]">
 
         {/* Hero title + signup form */}
         <div className="absolute inset-0 z-50 pointer-events-none">
-          <div className="flex flex-col h-full w-full items-center justify-center gap-8">
+          <div className="relative flex flex-col h-full w-full items-center justify-center gap-6 md:gap-8">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.94, filter: "blur(12px)" }}
+              animate={introPhase === "circle" && morphValue < 0.5
+                ? { opacity: 1 - morphValue * 2, scale: 1, filter: "blur(0px)" }
+                : { opacity: 0, scale: 0.94, filter: "blur(12px)" }}
+              transition={{ duration: 1 }}
+              className="absolute rounded-full border border-black/10 bg-white/95 shadow-[0_20px_70px_rgba(0,0,0,0.10)] w-[86vw] h-[86vw] max-w-[36rem] max-h-[36rem] md:w-[34rem] md:h-[34rem]"
+            />
+
             <motion.h1
               initial={{ opacity: 0, y: 20, filter: "blur(10px)" }}
               animate={introPhase === "circle" && morphValue < 0.5
                 ? { opacity: 1 - morphValue * 2, y: 0, filter: "blur(0px)" }
                 : { opacity: 0, filter: "blur(10px)" }}
               transition={{ duration: 1 }}
-              className="text-4xl md:text-5xl lg:text-7xl font-bold tracking-tighter text-black uppercase max-w-[90%] leading-[0.9] text-center"
+              className="relative z-10 text-[2.55rem] md:text-5xl lg:text-7xl font-bold tracking-tighter text-black uppercase max-w-[90%] leading-[0.9] text-center"
             >
               <span className="block">Parla.</span>
               <span className="block">Le Slide</span>
@@ -179,14 +195,14 @@ export default function IntroAnimation({ progress }: { progress?: MotionValue<nu
                 ? { opacity: 1 - morphValue * 2, y: 0 }
                 : { opacity: 0, y: 20 }}
               transition={{ duration: 1, delay: 0.1 }}
-              className="flex flex-col items-center gap-3 w-full max-w-sm pointer-events-auto relative z-[100]"
+              className="relative z-10 flex flex-col items-center gap-3 w-full max-w-sm pointer-events-auto"
             >
               <p className="text-xs text-zinc-400 text-center">
                 Accesso anticipato — iscriviti alla lista d&apos;attesa
               </p>
               {success ? (
                 <div
-                  className="w-full max-w-sm h-12 inline-flex items-center justify-center gap-2 border border-black px-4 bg-black text-white text-sm font-medium"
+                  className="w-full max-w-sm h-12 inline-flex items-center justify-center gap-2 border border-black px-4 bg-black text-white text-sm font-medium shadow-lg"
                   style={{ borderRadius: "9999px" }}
                 >
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
@@ -195,7 +211,7 @@ export default function IntroAnimation({ progress }: { progress?: MotionValue<nu
               ) : (
                 <form
                   onSubmit={handleSubmit}
-                  className="relative flex w-full max-w-sm items-center border border-black/20 bg-white p-1 pl-4 shadow-sm transition-all focus-within:border-black/50"
+                  className="relative flex w-full max-w-sm items-center border border-black/20 bg-white p-1 pl-4 shadow-lg transition-all focus-within:border-black/50"
                   style={{ borderRadius: "9999px" }}
                 >
                   <input
@@ -223,74 +239,101 @@ export default function IntroAnimation({ progress }: { progress?: MotionValue<nu
         {/* Arc content: Come funziona */}
         <motion.div
           style={{ opacity: contentOpacity, y: contentY }}
-          className="absolute top-[6%] z-10 flex flex-col items-center justify-center text-center px-4 pointer-events-auto w-full"
+          className="absolute top-[4%] z-10 flex flex-col items-center justify-center text-center px-4 pointer-events-auto w-full"
         >
-          <h2 className="text-xl md:text-3xl font-bold text-gray-900 tracking-tight mb-2">
-            Come funziona Slaidd
-          </h2>
-          <p className="text-sm text-gray-500 max-w-lg leading-relaxed mb-6">
-            Apri l&apos;app, parla come faresti normalmente. Slaidd ascolta, capisce e costruisce
-            la presentazione in tempo reale — mentre stai ancora parlando.
-          </p>
+          <div className="w-full max-w-4xl rounded-[2rem] border border-black/10 bg-white/90 px-5 py-6 shadow-xl backdrop-blur-sm sm:px-8 sm:py-8">
+            <h2 className="text-2xl sm:text-4xl font-bold text-gray-900 tracking-tight mb-3">
+              Come funziona Slaidd
+            </h2>
+            <p className="text-base sm:text-lg text-gray-600 max-w-2xl mx-auto leading-relaxed mb-2">
+              Apri l&apos;app, parli come faresti normalmente e la presentazione nasce mentre stai ancora spiegando.
+            </p>
+            <p className="text-sm sm:text-base text-gray-500 max-w-2xl mx-auto leading-relaxed mb-6">
+              Dal microfono al layout finale, ogni passaggio e progettato per darti una slide pronta in pochi istanti.
+            </p>
 
-          {/* Steps */}
-          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-0 mb-7 max-w-xl w-full justify-center">
-            {[
-              { n: "01", label: "Parli", detail: "Microfono nativo, nessun cloud" },
-              { n: "02", label: "Due LLM elaborano", detail: "Trascrizione + layout JSON" },
-              { n: "03", label: "La slide appare", detail: "Render in meno di 200ms" },
-            ].map((s, i) => (
-              <React.Fragment key={s.n}>
-                <div className="flex flex-col items-center gap-1 min-w-[100px]">
-                  <span className="text-[10px] font-mono text-gray-300">{s.n}</span>
-                  <span className="text-xs font-semibold text-gray-900">{s.label}</span>
-                  <span className="text-[10px] text-gray-400 text-center">{s.detail}</span>
+            {/* Steps */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3 sm:gap-4 mb-7">
+              {[
+                {
+                  n: "01",
+                  label: "Parli in modo naturale",
+                  detail: "Input vocale nativo, senza cambiare il tuo flusso.",
+                  sub: "Audio elaborato in locale, niente cloud per la voce.",
+                },
+                {
+                  n: "02",
+                  label: "Due LLM coordinano il contenuto",
+                  detail: "Uno trascrive e capisce il senso, l&apos;altro costruisce il layout JSON.",
+                  sub: "Titoli, gerarchia e struttura della slide restano coerenti.",
+                },
+                {
+                  n: "03",
+                  label: "La slide compare subito",
+                  detail: "Rendering rapido e continuo mentre continui a parlare.",
+                  sub: "Tempo medio di comparsa sotto i 200ms.",
+                },
+              ].map((s) => (
+                <div
+                  key={s.n}
+                  className="rounded-2xl border border-black/10 bg-white p-4 sm:p-5 text-left shadow-sm"
+                >
+                  <span className="inline-flex mb-3 rounded-full border border-black/10 bg-black/5 px-2.5 py-1 text-[11px] font-mono text-gray-700">
+                    {s.n}
+                  </span>
+                  <h3 className="text-sm sm:text-base font-semibold text-gray-900 mb-1.5">
+                    {s.label}
+                  </h3>
+                  <p className="text-xs sm:text-sm text-gray-600 leading-relaxed mb-1.5">
+                    {s.detail}
+                  </p>
+                  <p className="text-[11px] sm:text-xs text-gray-500 leading-relaxed">
+                    {s.sub}
+                  </p>
                 </div>
-                {i < 2 && (
-                  <span className="hidden sm:block text-gray-200 mx-2 text-lg self-center pb-3">→</span>
-                )}
-              </React.Fragment>
-            ))}
-          </div>
-
-          {/* Second signup form */}
-          {arcSuccess ? (
-            <div
-              className="inline-flex items-center gap-2 border border-black bg-black text-white text-xs px-5 py-2.5 font-medium"
-              style={{ borderRadius: "9999px" }}
-            >
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-              Sei in lista. Ti avvisiamo al lancio.
+              ))}
             </div>
-          ) : (
-            <form
-              onSubmit={handleArcSubmit}
-              className="flex w-full max-w-xs items-center border border-black/15 bg-white/90 backdrop-blur-sm p-1 pl-4 shadow-sm transition-all focus-within:border-black/40"
-              style={{ borderRadius: "9999px" }}
-            >
-              <input
-                name="email"
-                type="email"
-                placeholder="Unisciti alla lista d'attesa..."
-                className="flex-1 min-w-0 bg-transparent py-2 text-xs outline-none placeholder:text-zinc-400 text-black"
-                required
-                disabled={arcLoading}
-              />
-              <button
-                type="submit"
-                disabled={arcLoading}
-                className="h-8 shrink-0 bg-black px-4 text-xs font-medium text-white transition-colors hover:bg-zinc-800 disabled:opacity-50"
+
+            {/* Second signup form */}
+            {arcSuccess ? (
+              <div
+                className="inline-flex items-center gap-2 border border-black bg-black text-white text-sm px-6 py-3 font-medium"
                 style={{ borderRadius: "9999px" }}
               >
-                {arcLoading ? "..." : "Accesso anticipato"}
-              </button>
-            </form>
-          )}
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                Sei in lista. Ti avvisiamo al lancio.
+              </div>
+            ) : (
+              <form
+                onSubmit={handleArcSubmit}
+                className="flex w-full max-w-xl mx-auto items-center border border-black/15 bg-white p-1.5 pl-5 shadow-sm transition-all focus-within:border-black/40"
+                style={{ borderRadius: "9999px" }}
+              >
+                <input
+                  name="email"
+                  type="email"
+                  placeholder="Unisciti alla lista d'attesa..."
+                  className="flex-1 min-w-0 bg-transparent py-2.5 text-sm sm:text-base outline-none placeholder:text-zinc-400 text-black"
+                  required
+                  disabled={arcLoading}
+                />
+                <button
+                  type="submit"
+                  disabled={arcLoading}
+                  className="h-10 shrink-0 bg-black px-5 sm:px-6 text-sm font-medium text-white transition-colors hover:bg-zinc-800 disabled:opacity-50"
+                  style={{ borderRadius: "9999px" }}
+                >
+                  {arcLoading ? "..." : "Accesso anticipato"}
+                </button>
+              </form>
+            )}
+          </div>
         </motion.div>
 
         {/* Slide cards */}
         <div className="relative flex items-center justify-center w-full h-full">
           {SLIDES.slice(0, TOTAL_SLIDES).map((src, i) => {
+            const hiddenOnMobile = isMobile && i >= visibleSlideCount;
             let target = { x: 0, y: 0, rotation: 0, scale: 1, opacity: 1 };
 
             if (introPhase === "scatter") {
@@ -300,10 +343,12 @@ export default function IntroAnimation({ progress }: { progress?: MotionValue<nu
               const totalW = TOTAL_SLIDES * spacing;
               target = { x: i * spacing - totalW / 2, y: 0, rotation: 0, scale: 1, opacity: 1 };
             } else {
-              const isMobile = containerSize.width < 768;
               const minDim = Math.min(containerSize.width, containerSize.height);
-              const circleRadius = Math.min(minDim * 0.50, 480);
-              const circleAngle = (i / TOTAL_SLIDES) * 360;
+              const desiredRadius = minDim * (isMobile ? 0.74 : 0.50);
+              const circleRadius = isMobile
+                ? Math.min(desiredRadius, 320)
+                : Math.min(desiredRadius, 480);
+              const circleAngle = (i / visibleSlideCount) * 360;
               const circleRad = (circleAngle * Math.PI) / 180;
               const circlePos = {
                 x: Math.cos(circleRad) * circleRadius,
@@ -316,7 +361,7 @@ export default function IntroAnimation({ progress }: { progress?: MotionValue<nu
               const arcCenterY = arcApexY + arcRadius;
               const spreadAngle = isMobile ? 100 : 130;
               const startAngle = -90 - spreadAngle / 2;
-              const step = spreadAngle / (TOTAL_SLIDES - 1);
+              const step = spreadAngle / (visibleSlideCount - 1);
               const scrollProgress = Math.min(Math.max(rotateValue / 360, 0), 1);
               const boundedRotation = -scrollProgress * spreadAngle * 0.8;
               const currentArcAngle = startAngle + i * step + boundedRotation;
@@ -331,12 +376,15 @@ export default function IntroAnimation({ progress }: { progress?: MotionValue<nu
                 x: lerp(circlePos.x, arcPos.x, morphValue),
                 y: lerp(circlePos.y, arcPos.y, morphValue),
                 rotation: lerp(circlePos.rotation, arcPos.rotation, morphValue),
-                scale: lerp(1, arcPos.scale, morphValue),
+                scale: lerp(isMobile ? 1.08 : 1, arcPos.scale, morphValue),
                 opacity: 1,
               };
             }
+            if (hiddenOnMobile) {
+              target = { x: target.x, y: target.y, rotation: target.rotation, scale: 0.4, opacity: 0 };
+            }
 
-            return <SlideCard key={i} src={src} target={target} />;
+            return <SlideCard key={i} src={src} target={target} size={cardSize} />;
           })}
         </div>
 
